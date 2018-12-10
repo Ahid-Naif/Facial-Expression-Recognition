@@ -6,4 +6,4 @@ numClasses = 6
 train_hdf5 = "dataset/hdf5/train.hdf5"
 vald_hdf5 = "dataset/hdf5/val.hdf5"
 test_hdf5 = "dataset/hdf5/test.hdf5"
-batchSize = 32
+batchSize = 64
