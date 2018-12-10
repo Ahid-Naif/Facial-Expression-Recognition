@@ -1,18 +1,7 @@
 from configuration import emotionConfiguration as config
-from utils import loadData, transposeData, plotHistory, ImageToArrayPreprocessor, makeOneMatrix
+from utils import plotHistory, ImageToArrayPreprocessor, makeOneMatrix
 from pyimagesearch.io.hdf5datasetgenerator import HDF5DatasetGenerator
-import numpy as np
 import tensorflow as tf
-import pickle
-import os
-
-# Loading the data
-# trainData, trainLabels, valData, valLabels, testData, testLabels = loadData(trainPath, 
-#                                                                     validationPath, testPath, numClasses)
-
-# trainData, trainLabels = transposeData(trainData, trainLabels)
-# valData, valLabels = transposeData(valData, valLabels)
-# testData, testLabels = transposeData(testData, testLabels)
 
 trainAug = tf.keras.preprocessing.image.ImageDataGenerator(rotation_range=10, zoom_range=0.1,
                             horizontal_flip=True, rescale=1 / 255.0, fill_mode="nearest")
@@ -58,16 +47,9 @@ model.compile(optimizer=tf.keras.optimizers.Adam(lr=learningRate), loss='categor
 history = model.fit(trainData, trainLabels, epochs=numEpochs, batch_size=batchSize,
                     validation_data=(valData, valLabels))
 
-# history = model.fit_generator(trainGen.generator(), steps_per_epoch=trainGen.numImages // config.batchSize,
-#                                 validation_data=valGen.generator(),
-#                                 validation_steps=valGen.numImages // config.batchSize,
-#                                 epochs= numEpochs,
-#                                 max_queue_size=config.batchSize * 2,
-#                                 max_queue_size=config.batchSize * 2,
-#                                 verbose=1))
-
 # close the databases
 trainGen.close()
 valGen.close()
+
 # print result
 plotHistory(history)

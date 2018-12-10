@@ -1,48 +1,7 @@
-import h5py
 from configuration import emotionConfiguration as config
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-
-def loadData(trainPath, valPath, testPath, numClasses):
-    db_train = h5py.File(trainPath)
-    db_val = h5py.File(valPath)
-    db_test = h5py.File(testPath)
-    
-
-    trainData = np.array(db_train["images"][:])
-    trainLabels = np.array(db_train["labels"][:])
-
-    valData = np.array(db_val["images"][:])
-    valLabels = np.array(db_val["labels"][:])
-
-    testData = np.array(db_test["images"][:])
-    testLabels = np.array(db_test["labels"][:])
-
-    trainData, trainLabels = standarize(trainData, trainLabels, numClasses)
-    valData, valLabels = standarize(valData, valLabels, numClasses)
-    testData, testLabels = standarize(testData, testLabels, numClasses)
-    
-    return trainData, trainLabels, valData, valLabels, testData, testLabels
-
-def standarize(data, labels, numClasses):
-    # A trick when you want to flatten a matrix X of shape (a,b,c,d) 
-    # to a matrix X_flatten of shape (b∗∗c∗∗d, a) is to use:
-    # X_flatten = X.reshape(a, -1).T      
-    # # X.T is the transpose of X
-
-    data_flatten = data.reshape(data.shape[0], -1).T # vectorize all images
-    # standardize our dataset
-    data = data_flatten / 255
-    # Convert training and test labels to one hot matrices
-    labels = np.eye(numClasses)[labels.reshape(-1)].T
-
-    return data, labels
-
-def transposeData(data, label):
-    data = np.transpose(data)
-    label = np.transpose(label)
-    return data, label
 
 def plotHistory(history):
     loss_list = [s for s in history.history.keys() if 'loss' in s and 'val' not in s]
@@ -86,16 +45,6 @@ def plotHistory(history):
     plt.legend()
     plt.show()
 
-class ImageToArrayPreprocessor:
-	def __init__(self, dataFormat=None):
-		# store the image data format
-		self.dataFormat = dataFormat
-
-	def preprocess(self, image):
-		# apply the Keras utility function that correctly rearranges
-		# the dimensions of the image
-		return tf.keras.preprocessing.image.img_to_array(image, data_format=self.dataFormat)
-
 def makeOneMatrix(Gen):
     # initialize the image matrix and label
     features = np.zeros(shape=(Gen.numImages, 48, 48, 1))
@@ -110,3 +59,13 @@ def makeOneMatrix(Gen):
 
     features = np.reshape(features, (Gen.numImages, 48 * 48))
     return features, labels
+
+class ImageToArrayPreprocessor:
+	def __init__(self, dataFormat=None):
+		# store the image data format
+		self.dataFormat = dataFormat
+
+	def preprocess(self, image):
+		# apply the Keras utility function that correctly rearranges
+		# the dimensions of the image
+		return tf.keras.preprocessing.image.img_to_array(image, data_format=self.dataFormat)
